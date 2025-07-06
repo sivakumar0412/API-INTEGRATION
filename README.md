@@ -167,7 +167,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 Your Name - [sivakumar](sivakumar041203@gmail.com) 
 
-Project Link: [https://github.com/yourusername/api-integration-dashboard](https://github.com/yourusername/api-integration-dashboard)
+Project Link: [https://github.com/yourusername/api-integration-dashboard](https://github.com/sivakumar0412/API-INTEGRATION)
 
 ---
 
