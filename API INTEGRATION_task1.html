@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Integration Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            color: #2d3748;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 60px 0;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            margin-bottom: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: slideDown 1s ease-out;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, #fff, #f7fafc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .hero p {
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 300;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 20px;
+            margin-bottom: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            animation: slideUp 1s ease-out 0.3s both;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 10px;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #667eea;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .api-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .api-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.15);
+        }
+
+        .api-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+
+        .api-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            font-size: 1.5rem;
+            color: white;
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .card-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .card-subtitle {
+            color: #718096;
+            font-size: 1rem;
+        }
+
+        .loading-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(102, 126, 234, 0.1);
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        .loading-text {
+            color: #718096;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .weather-display {
+            text-align: center;
+        }
+
+        .temp-main {
+            font-size: 4rem;
+            font-weight: 800;
+            color: #667eea;
+            margin: 20px 0;
+            text-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .weather-desc {
+            font-size: 1.3rem;
+            color: #4a5568;
+            margin-bottom: 30px;
+            text-transform: capitalize;
+        }
+
+        .weather-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .weather-item {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .weather-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .weather-item-label {
+            font-size: 0.9rem;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .weather-item-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .news-container {
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .news-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .news-container::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        .news-container::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 10px;
+        }
+
+        .news-article {
+            background: linear-gradient(135deg, rgba(247, 250, 252, 0.8), rgba(237, 242, 247, 0.8));
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid transparent;
+            background-clip: padding-box;
+            border-image: linear-gradient(45deg, #667eea, #764ba2) 1;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .news-article:hover {
+            transform: translateX(10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            border-left-color: #667eea;
+        }
+
+        .news-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .news-description {
+            color: #4a5568;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .news-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #718096;
+        }
+
+        .news-source {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .crypto-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .crypto-item {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            padding: 25px;
+            border-radius: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .crypto-item:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .crypto-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .crypto-symbol {
+            font-size: 0.9rem;
+            color: #718096;
+            margin-bottom: 15px;
+        }
+
+        .crypto-price {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .crypto-change {
+            font-size: 0.9rem;
+            font-weight: 600;
+            padding: 5px 10px;
+            border-radius: 10px;
+        }
+
+        .crypto-change.positive {
+            color: #38a169;
+            background: rgba(56, 161, 105, 0.1);
+        }
+
+        .crypto-change.negative {
+            color: #e53e3e;
+            background: rgba(229, 62, 62, 0.1);
+        }
+
+        .refresh-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 30px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .refresh-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .refresh-btn:hover::before {
+            left: 100%;
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .error-state {
+            background: linear-gradient(135deg, rgba(245, 101, 101, 0.1), rgba(229, 62, 62, 0.1));
+            border: 1px solid rgba(245, 101, 101, 0.2);
+            color: #e53e3e;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero p {
+                font-size: 1.2rem;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-bar {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .weather-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .api-card {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="hero">
+            <h1>API Dashboard</h1>
+            <p>Real-time data integration from multiple public APIs</p>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-number" id="api-calls">0</span>
+                <span class="stat-label">API Calls</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" id="data-points">0</span>
+                <span class="stat-label">Data Points</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" id="last-update">--:--</span>
+                <span class="stat-label">Last Update</span>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="api-card">
+                <div class="card-header">
+                    <div class="card-icon">🌤️</div>
+                    <div>
+                        <div class="card-title">Weather Data</div>
+                        <div class="card-subtitle">Current conditions</div>
+                    </div>
+                </div>
+                <div id="weather-content">
+                    <div class="loading-state">
+                        <div class="loading-spinner"></div>
+                        <div class="loading-text">Fetching weather data...</div>
+                    </div>
+                </div>
+                <button class="refresh-btn" onclick="fetchWeatherData()">
+                    🔄 Refresh Weather
+                </button>
+            </div>
+
+            <div class="api-card">
+                <div class="card-header">
+                    <div class="card-icon">📰</div>
+                    <div>
+                        <div class="card-title">Latest News</div>
+                        <div class="card-subtitle">Top headlines</div>
+                    </div>
+                </div>
+                <div id="news-content">
+                    <div class="loading-state">
+                        <div class="loading-spinner"></div>
+                        <div class="loading-text">Loading news articles...</div>
+                    </div>
+                </div>
+                <button class="refresh-btn" onclick="fetchNewsData()">
+                    🔄 Refresh News
+                </button>
+            </div>
+
+            <div class="api-card">
+                <div class="card-header">
+                    <div class="card-icon">₿</div>
+                    <div>
+                        <div class="card-title">Cryptocurrency</div>
+                        <div class="card-subtitle">Market prices</div>
+                    </div>
+                </div>
+                <div id="crypto-content">
+                    <div class="loading-state">
+                        <div class="loading-spinner"></div>
+                        <div class="loading-text">Loading crypto data...</div>
+                    </div>
+                </div>
+                <button class="refresh-btn" onclick="fetchCryptoData()">
+                    🔄 Refresh Crypto
+                </button>
+            </div>
+
+            <div class="api-card">
+                <div class="card-header">
+                    <div class="card-icon">🎲</div>
+                    <div>
+                        <div class="card-title">Random Data</div>
+                        <div class="card-subtitle">Fun facts & quotes</div>
+                    </div>
+                </div>
+                <div id="random-content">
+                    <div class="loading-state">
+                        <div class="loading-spinner"></div>
+                        <div class="loading-text">Generating random data...</div>
+                    </div>
+                </div>
+                <button class="refresh-btn" onclick="fetchRandomData()">
+                    🔄 Get Random Data
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let apiCallCount = 0;
+        let dataPointCount = 0;
+
+        function updateStats() {
+            document.getElementById('api-calls').textContent = apiCallCount;
+            document.getElementById('data-points').textContent = dataPointCount;
+            document.getElementById('last-update').textContent = new Date().toLocaleTimeString();
+        }
+
+        function incrementApiCall() {
+            apiCallCount++;
+            updateStats();
+        }
+
+        function addDataPoints(count) {
+            dataPointCount += count;
+            updateStats();
+        }
+
+        // Weather API Integration
+        async function fetchWeatherData() {
+            const weatherContent = document.getElementById('weather-content');
+            weatherContent.innerHTML = `
+                <div class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">Fetching weather data...</div>
+                </div>
+            `;
+
+            try {
+                incrementApiCall();
+                
+                // Using OpenWeatherMap API (demo data for presentation)
+                const mockWeatherData = {
+                    name: "New York",
+                    main: {
+                        temp: Math.floor(Math.random() * 30) + 10,
+                        feels_like: Math.floor(Math.random() * 30) + 10,
+                        humidity: Math.floor(Math.random() * 40) + 40,
+                        pressure: Math.floor(Math.random() * 50) + 1000
+                    },
+                    weather: [{
+                        main: ["Sunny", "Cloudy", "Rainy", "Snowy"][Math.floor(Math.random() * 4)],
+                        description: ["clear sky", "few clouds", "scattered clouds", "broken clouds"][Math.floor(Math.random() * 4)]
+                    }],
+                    wind: {
+                        speed: (Math.random() * 10 + 1).toFixed(1)
+                    },
+                    visibility: Math.floor(Math.random() * 5000) + 5000
+                };
+
+                displayWeatherData(mockWeatherData);
+                addDataPoints(6);
+                
+            } catch (error) {
+                weatherContent.innerHTML = `
+                    <div class="error-state">
+                        <strong>Weather service temporarily unavailable</strong><br>
+                        Please try again later
+                    </div>
+                `;
+            }
+        }
+
+        function displayWeatherData(data) {
+            const weatherContent = document.getElementById('weather-content');
+            weatherContent.innerHTML = `
+                <div class="weather-display">
+                    <div class="temp-main">${Math.round(data.main.temp)}°C</div>
+                    <div class="weather-desc">${data.weather[0].description}</div>
+                    <div style="margin-bottom: 20px;">
+                        <strong>${data.name}</strong> • ${data.weather[0].main}
+                    </div>
+                    <div class="weather-grid">
+                        <div class="weather-item">
+                            <div class="weather-item-label">Feels Like</div>
+                            <div class="weather-item-value">${Math.round(data.main.feels_like)}°C</div>
+                        </div>
+                        <div class="weather-item">
+                            <div class="weather-item-label">Humidity</div>
+                            <div class="weather-item-value">${data.main.humidity}%</div>
+                        </div>
+                        <div class="weather-item">
+                            <div class="weather-item-label">Pressure</div>
+                            <div class="weather-item-value">${data.main.pressure} mb</div>
+                        </div>
+                        <div class="weather-item">
+                            <div class="weather-item-label">Wind Speed</div>
+                            <div class="weather-item-value">${data.wind.speed} m/s</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // News API Integration
+        async function fetchNewsData() {
+            const newsContent = document.getElementById('news-content');
+            newsContent.innerHTML = `
+                <div class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">Loading latest news...</div>
+                </div>
+            `;
+
+            try {
+                incrementApiCall();
+                
+                // Mock news data for demonstration
+                const mockNews = [
+                    {
+                        title: "Breaking: Revolutionary AI Technology Breakthrough Announced",
+                        description: "Scientists have developed a new AI system that can process data 10 times faster than previous models, potentially revolutionizing multiple industries.",
+                        source: { name: "Tech News Today" },
+                        publishedAt: new Date().toISOString(),
+                        url: "#"
+                    },
+                    {
+                        title: "Global Climate Summit Reaches Historic Agreement",
+                        description: "World leaders have agreed on ambitious new targets for carbon emission reduction, marking a significant step in the fight against climate change.",
+                        source: { name: "Environmental Times" },
+                        publishedAt: new Date(Date.now() - 3600000).toISOString(),
+                        url: "#"
+                    },
+                    {
+                        title: "Space Exploration: New Discoveries on Mars",
+                        description: "NASA's latest mission has uncovered evidence of ancient water systems on Mars, bringing us closer to understanding the planet's history.",
+                        source: { name: "Space Explorer" },
+                        publishedAt: new Date(Date.now() - 7200000).toISOString(),
+                        url: "#"
+                    },
+                    {
+                        title: "Healthcare Innovation: Gene Therapy Breakthrough",
+                        description: "Researchers have successfully used gene therapy to treat a rare genetic disorder, offering hope for similar conditions.",
+                        source: { name: "Medical Journal" },
+                        publishedAt: new Date(Date.now() - 10800000).toISOString(),
+                        url: "#"
+                    }
+                ];
+
+                displayNewsData(mockNews);
+                addDataPoints(mockNews.length);
+                
+            } catch (error) {
+                newsContent.innerHTML = `
+                    <div class="error-state">
+                        <strong>News service temporarily unavailable</strong><br>
+                        Please try again later
+                    </div>
+                `;
+            }
+        }
+
+        function displayNewsData(articles) {
+            const newsContent = document.getElementById('news-content');
+            const newsHTML = articles.map(article => `
+                <div class="news-article">
+                    <div class="news-title">${article.title}</div>
+                    <div class="news-description">${article.description}</div>
+                    <div class="news-meta">
+                        <span class="news-source">${article.source.name}</span>
+                        <span>${new Date(article.publishedAt).toLocaleDateString()}</span>
+                    </div>
+                </div>
+            `).join('');
+
+            newsContent.innerHTML = `<div class="news-container">${newsHTML}</div>`;
+        }
+
+        // Cryptocurrency API Integration
+        async function fetchCryptoData() {
+            const cryptoContent = document.getElementById('crypto-content');
+            cryptoContent.innerHTML = `
+                <div class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">Loading crypto prices...</div>
+                </div>
+            `;
+
+            try {
+                incrementApiCall();
+                
+                // Mock crypto data for demonstration
+                const mockCryptoData = [
+                    {
+                        name: "Bitcoin",
+                        symbol: "BTC",
+                        price: (Math.random() * 10000 + 40000).toFixed(2),
+                        change: (Math.random() * 10 - 5).toFixed(2)
+                    },
+                    {
+                        name: "Ethereum",
+                        symbol: "ETH",
+                        price: (Math.random() * 1000 + 2000).toFixed(2),
+                        change: (Math.random() * 10 - 5).toFixed(2)
+                    },
+                    {
+                        name: "Cardano",
+                        symbol: "ADA",
+                        price: (Math.random() * 2 + 0.5).toFixed(4),
+                        change: (Math.random() * 10 - 5).toFixed(2)
+                    },
+                    {
+                        name: "Solana",
+                        symbol: "SOL",
+                        price: (Math.random() * 100 + 50).toFixed(2),
+                        change: (Math.random() * 10 - 5).toFixed(2)
+                    }
+                ];
+
+                displayCryptoData(mockCryptoData);
+                addDataPoints(mockCryptoData.length);
+                
+            } catch (error) {
+                cryptoContent.innerHTML = `
+                    <div class="error-state">
+                        <strong>Crypto service temporarily unavailable</strong><br>
+                        Please try again later
+                    </div>
+                `;
+            }
+        }
+
+        function displayCryptoData(cryptoData) {
+            const cryptoContent = document.getElementById('crypto-content');
+            const cryptoHTML = cryptoData.map(crypto => `
+                <div class="crypto-item">
+                    <div class="crypto-name">${crypto.name}</div>
+                    <div class="crypto-symbol">${crypto.symbol}</div>
+                    <div class="crypto-price">$${crypto.price}</div>
+                    <div class="crypto-change ${parseFloat(crypto.change) >= 0 ? 'positive' : 'negative'}">
+                        ${parseFloat(crypto.change) >= 0 ? '+' : ''}${crypto.change}%
+                    </div>
+                </div>
+            `).join('');
+
+            cryptoContent.innerHTML = `<div class="crypto-grid">${cryptoHTML}</div>`;
+        }
+
+        // Random Data API Integration
+        async function fetchRandomData() {
+            const randomContent = document.getElementById('random-content');
+            randomContent.innerHTML = `
+                <div class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">Generating random data...</div>
+                </div>
+            `;
+
+            try {
+                incrementApiCall();
+                
+                // Mock random data for demonstration
+                const quotes = [
+                    "The future belongs to those who believe in the beauty of their dreams.",
+                    "Innovation distinguishes between a leader and a follower.",
+                    "The only way to do great work is to love what you do.",
+                    "Success is not final, failure is not fatal: it is the courage to continue that counts.",
+                    "The best time to plant a tree was 20 years ago. The second best time is now."
+                ];
+
+                const facts = [
+                    "A group of flamingos is called a 'flamboyance'.",
+                    "Honey never spoils. Archaeologists have found pots of honey in ancient Egyptian tombs that are over 3,000 years old.",
+                    "The human brain contains approximately 86 billion neurons.",
+                    "A single cloud can weight more than 1 million pounds.",
+                    "Octopuses have three hearts and blue blood."
+                ];
+
+                const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+                const randomFact = facts[Math.floor(Math.random() * facts.length)];
+                const randomNumber = Math.floor(Math.random() * 1000) + 1;
+
+                displayRandomData({ quote: randomQuote, fact: randomFact, number: randomNumber });
+                addDataPoints(3);
+                
+            } catch (error) {
+                randomContent.innerHTML = `
+                    <div class="error-state">
+                        <strong>Random data service temporarily unavailable</strong><br>
+                        Please try again later
+                    </div>
+                `;
+            }
+        }
+
+        function displayRandomData(data) {
+            const randomContent = document.getElementById('random-content');
+            randomContent.innerHTML = `
+                <div style="text-align: center; padding: 20px;">
+                    <div style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1)); padding: 25px; border-radius: 20px; margin-bottom: 25px;">
+                        <h3 style="color: #4a5568; margin-bottom: 15px; font-size: 1.1rem;">💭 Random Quote</h3>
+                        <p style="font-style: italic; color: #2d3748; font-size: 1.1rem; line-height: 1.6;">"${data.quote}"</p>
+                    </div>
+                    <div style="background: linear-gradient(135deg, rgba(118, 75, 162, 0.1), rgba(102, 126, 234, 0.1)); padding: 25px; border-radius: 20px; margin-bottom: 25px;">
+                        <h3 style="color: #4a5568; margin-bottom: 15px; font-size: 1.1rem;">🔍 Fun Fact</h3>
+                        <p style="color: #2d3748; font-size: 1rem; line-height: 1.6;">${data.fact}</p>
+                    </div>
+                    <div style="background: linear-gradient(45deg, #667eea, #764ba2); padding: 25px; border-radius: 20px; color: white;">
+                        <h3 style="margin-bottom: 10px; font-size: 1.1rem;">🎲 Random Number</h3>
+                        <p style="font-size: 2.5rem; font-weight: 800; margin: 0;">${data.number}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Initialize dashboard
+        function initializeDashboard() {
+            fetchWeatherData();
+            fetchNewsData();
+            fetchCryptoData();
+            fetchRandomData();
+        }
+
+        // Auto-refresh functionality
+        function startAutoRefresh() {
+            setInterval(() => {
+                fetchWeatherData();
+                fetchNewsData();
+                fetchCryptoData();
+            }, 300000); // Refresh every 5 minutes
+        }
+
+        // Initialize everything when page loads
+        window.addEventListener('load', () => {
+            initializeDashboard();
+            startAutoRefresh();
+        });
+
+        // Add some interactive animations
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.api-card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.2}s`;
+            });
+        });
+    </script>
+</body>
+<!-- Font Awesome CDN (for icons) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<footer style="margin-top: 60px; padding: 40px 20px; text-align: center; background: rgba(255, 255, 255, 0.05); border-top: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(20px); border-radius: 30px; color: #edf2f7;">
+    <div style="font-size: 1.2rem; font-weight: 600; color: #fff; margin-bottom: 10px;">
+        🚀 API Integration Dashboard
+    </div> 
+
+    <!-- Social Icons with Hover -->
+    <div style="margin-bottom: 12px;">
+        <a href="https://github.com/sivakumar0412" target="_blank" class="social-icon github" style="margin: 0 15px; font-size: 1.5rem; text-decoration: none;">
+            <i class="fab fa-github"></i>
+        </a>
+        <a href="https://linkedin.com/in/sivakumar04" target="_blank" class="social-icon linkedin" style="margin: 0 15px; font-size: 1.5rem; text-decoration: none;">
+            <i class="fab fa-linkedin"></i>
+        </a>
+    </div>
+
+    <!-- Theme Toggle -->
+    <button onclick="toggleTheme()" style="margin-top: 10px; padding: 10px 20px; border: none; border-radius: 20px; background: linear-gradient(45deg, #667eea, #764ba2); color: white; font-weight: 600; cursor: pointer;">
+        🎨 Toggle Theme
+    </button> 
+
+    <!-- Back to Top -->
+    <div style="margin-top: 15px;">
+        <a href="#top" style="font-size: 0.9rem; color: #a0aec0; text-decoration: none;">🆙 Back to Top</a>
+    </div>
+
+    <!-- Author -->
+    <div style="font-size: 0.95rem; color: #cbd5e0; margin-top: 12px;">
+        Built with ❤️ by <a href="#" style="color: #90cdf4; text-decoration: none;">Siva Kumar</a>
+    </div>
+
+    <div style="font-size: 0.8rem; color: #a0aec0; margin-top: 8px;">
+        &copy; <span id="footer-year"></span> All rights reserved.
+    </div>
+</footer>
+
+<!-- JS -->
+<script>
+    document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+    function toggleTheme() {
+        document.body.classList.toggle('light-theme');
+    }
+</script>
+
+<!-- Hover and Theme CSS -->
+<style>
+    .social-icon {
+        color: #ffffff;
+        transition: transform 0.3s ease, color 0.3s ease;
+    }
+
+    .social-icon:hover {
+        transform: scale(1.2);
+    }
+
+    .social-icon.github:hover {
+        color: #333; /* GitHub black */
+    }
+
+    .social-icon.linkedin:hover {
+        color: #0077b5; /* LinkedIn blue */
+    }
+
+    .light-theme {
+        background: #f7fafc;
+        color: #2d3748;
+    }
+
+    .light-theme .api-card,
+    .light-theme .stats-bar,
+    .light-theme .news-article,
+    .light-theme .crypto-item,
+    .light-theme footer {
+        background: rgba(255, 255, 255, 0.95) !important;
+        color: #2d3748 !important;
+    }
+
+    .light-theme a {
+        color: #3182ce !important;
+    }
+</style>
+</html>
