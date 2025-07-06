@@ -176,7 +176,7 @@ Project Link: [https://github.com/yourusername/api-integration-dashboard](https:
 
 ⭐ If you found this project helpful, please give it a star on GitHub!
 
-##OUTPUT:
+## OUTPUT:
 
 <img width="1920" height="1080" alt="Image" src="https://github.com/user-attachments/assets/b5b44dde-8aac-4df9-9a25-480ae99fdeaf" />
 
