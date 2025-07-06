@@ -165,7 +165,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📧 Contact
 
-Your Name - [sivakumar](sivakumar041203@gmail.com) 
+## 📬 Contact
+
+Feel free to reach out via email: [sivakumar041203@gmail.com](mailto:sivakumar041203@gmail.com)
+
 
 Project Link: [https://github.com/yourusername/api-integration-dashboard](https://github.com/sivakumar0412/API-INTEGRATION)
 
