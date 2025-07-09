@@ -165,8 +165,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📧 Contact
 
-## 📬 Contac
-
 Feel free to reach out via email: [sivakumar041203@gmail.com](mailto:sivakumar041203@gmail.com)
 
 
